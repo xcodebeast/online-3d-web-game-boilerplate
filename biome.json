@@ -1,0 +1,82 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.6.3/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": ["**", "!!**/bun.lock"]
+  },
+  "formatter": {
+    "indentStyle": "space",
+    "indentWidth": 2
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "a11y": "error",
+      "complexity": "error",
+      "correctness": "error",
+      "nursery": "error",
+      "performance": "error",
+      "security": "error",
+      "style": "error",
+      "suspicious": "error"
+    },
+    "domains": {
+      "project": "all",
+      "types": "all",
+      "react": "all",
+      "test": "all",
+      "tailwind": "all",
+      "astro": "none",
+      "drizzle": "none",
+      "next": "none",
+      "playwright": "none",
+      "qwik": "none",
+      "reactNative": "none",
+      "solid": "none",
+      "svelte": "none",
+      "tanstackQuery": "none",
+      "turborepo": "none",
+      "vue": "none"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  },
+  "javascript": {
+    "globals": ["Bun"]
+  },
+  "overrides": [
+    {
+      "includes": ["apps/client/src/app/app.tsx"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUnknownAttribute": {
+              "level": "error",
+              "options": {
+                "ignore": [
+                  "args",
+                  "intensity",
+                  "position",
+                  "angle",
+                  "penumbra",
+                  "decay",
+                  "scale",
+                  "anchorX",
+                  "anchorY"
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

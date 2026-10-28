@@ -8,6 +8,18 @@
     "docker-build": {
       "dependsOn": ["build"],
       "command": "docker build -f apps/client/Dockerfile . -t client"
+    },
+    "build": {
+      "command": "bun --bun vite build --config apps/client/vite.config.ts",
+      "cache": true,
+      "outputs": ["{workspaceRoot}/dist/apps/client"]
+    },
+    "serve": {
+      "command": "bun --bun vite --config apps/client/vite.config.ts",
+      "continuous": true
+    },
+    "preview": {
+      "command": "bun --bun vite preview --config apps/client/vite.config.ts"
     }
   }
 }

@@ -1,35 +1,32 @@
-import { MapSchema } from "@colyseus/schema";
-import { GameState, GameStateProperties } from "@common";
-import { Room } from "colyseus.js";
+import type { Room } from "@colyseus/sdk";
 import { create } from "zustand";
+import type { GameState } from "../../../../libs/common/src/lib/entities/GameState.ts";
 
-/** Networking properties from colyseus */
-type NetworkingProperties = {
-    room: Room<GameState> | null;
+interface PlayerScore {
+  id: string;
+  score: number;
+}
+interface GameStore {
+  room: Room<GameState> | null;
+  players: PlayerScore[];
+  unpackServerData: (room: Room<GameState>, state: GameState) => void;
+  reset: () => void;
 }
 
-/** Networking utilities */
-type NetworkingUtils = {
-    /**  Unpacks the server data into the store */
-    unpackServerData: (room: Room, incomingState: GameState) => void;
-}
-
-/** Game store type */
-export type GameStore = GameStateProperties & NetworkingProperties & NetworkingUtils & {
-    // Add custom store properties here
-}
-
-/** Game store */
+/** Copies mutable schema data so React receives a fresh snapshot per patch. */
 export const useGameStore = create<GameStore>()((set) => ({
-    unpackServerData: (room, incomingState) => set((state) => ({
-        ...state,
-        ...incomingState,
-        room,
-    })),
-
-    // Networking properties (from colyseus)
-    room: null,
-
-    // Game state properties (from server)
-    players: new MapSchema(),
-}))
+  room: null,
+  players: [],
+  unpackServerData: (room: Room<GameState>, state: GameState): void =>
+    set({
+      room,
+      players: Array.from(
+        state.players.values(),
+        ({ id, score }): PlayerScore => ({
+          id,
+          score,
+        }),
+      ),
+    }),
+  reset: () => set({ room: null, players: [] }),
+}));

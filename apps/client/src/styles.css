@@ -1,3 +1,2 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* biome-ignore lint/nursery/useLayeredStyles: Tailwind defines its own theme, base, components, and utilities layers. */
+@import "tailwindcss";

@@ -1,35 +1,34 @@
-import { EventTypes, GameState } from "@common";
-import { Client, ClientArray, Room } from "colyseus";
-import { Colors, colorize, log } from "../lib/log";
+import { type Client, Room } from "@colyseus/core";
+import { GameState } from "../../../../libs/common/src/lib/entities/GameState.ts";
+import { EventTypes } from "../../../../libs/common/src/lib/types.ts";
+import { Colors, colorize, log } from "../lib/log.ts";
 
-export class GameRoom extends Room<GameState> {
+/** Hosts the authoritative player scores for one game. */
+export class GameRoom extends Room<{ state: GameState }> {
+  override state = new GameState();
 
-  /*±±±±± Lifecycle events ±±±±±*/
-
-  onCreate() {
-    this.setState(new GameState());
-
-    this.onMessage(EventTypes.INCREASE_SCORE, (client) => this.onIncreaseScore(client, this.state));
+  override onCreate(): void {
+    this.onMessage(EventTypes.increaseScore, this.onIncreaseScore.bind(this));
   }
 
-  onJoin({ sessionId }: Client) {
+  override onJoin({ sessionId }: Client): void {
     this.state.addPlayer(sessionId);
     log(`Player ${sessionId} has joined`);
   }
 
-  onLeave({ sessionId }: Client<this["clients"] extends ClientArray<infer U, any> ? U : never, this["clients"] extends ClientArray<infer _, infer U> ? U : never>, consented?: boolean): void | Promise<any> {
+  override onLeave({ sessionId }: Client): void {
     this.state.removePlayer(sessionId);
     log(`Player ${sessionId} has left`);
   }
 
-  /*±±±±± Custom events ±±±±±*/
-
-  onIncreaseScore({ sessionId }: Client, state: GameState) {
-    if (!state.hasPlayer(sessionId)) return;
-
-    const player = state.getPlayer(sessionId);
-
+  private onIncreaseScore({ sessionId }: Client): void {
+    const player = this.state.getPlayer(sessionId);
+    if (!player) {
+      return;
+    }
     player.increaseScore();
-    log(`Player ${sessionId} has increased score to ${colorize(player.score, Colors.YELLOW)}`);
+    log(
+      `Player ${sessionId} has increased score to ${colorize(player.score, Colors.yellow)}`,
+    );
   }
 }
