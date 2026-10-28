@@ -8,16 +8,18 @@
     "client:serve": "bun --bun nx run client:serve",
     "client:preview": "bun --bun nx run client:preview",
     "server:serve": "bun --bun nx run server:serve",
-    "build": "bun --bun nx run-many --target=build -p client server --parallel=2",
+    "build": "bun --bun nx run-many --target=build -p client server --parallel=2 && bun run check:bundle",
     "docker-build": "bun --bun nx run-many --target=docker-build -p client server --parallel=2",
     "lint": "biome check --error-on-warnings .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "typecheck": "bun --bun tsc --noEmit -p tsconfig.json",
-    "test": "bun test",
+    "test": "bun test ./tests",
     "start": "bun dist/apps/server/main.js",
     "check": "bun run lint && bun run typecheck && bun run test && bun run build",
-    "client:build": "bun --bun nx run client:build"
+    "client:build": "bun --bun nx run client:build && bun run check:bundle",
+    "test:browser": "bun --bun playwright test",
+    "check:bundle": "bun scripts/check-client-bundle.ts"
   },
   "private": true,
   "dependencies": {
@@ -48,6 +50,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.3",
+    "@playwright/test": "1.64.1",
     "@tailwindcss/vite": "4.3.3",
     "@types/bun": "1.4.4",
     "@types/node": "26.6.5",

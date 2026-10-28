@@ -17,8 +17,15 @@ jobs:
       - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: 1.4.4
-      - run: bun install --frozen-lockfile
+      - run: bun install
+      - name: Export updated Bun lockfile
+        run: |
+          echo LOCKFILE_BEGIN
+          cat bun.lock
+          echo LOCKFILE_END
       - run: bun run check
+      - run: bun --bun playwright install --with-deps chromium
+      - run: bun run test:browser
   containers:
     needs: check
     runs-on: ubuntu-latest
