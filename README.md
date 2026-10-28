@@ -27,7 +27,7 @@ bun run lint:fix    # Apply safe Biome fixes
 bun run format     # Format supported files
 ```
 
-Biome replaces ESLint and Prettier. Every rule group, including nursery, is enabled at error severity; warnings fail CI too. Any necessary framework-specific suppression must stay local and explain why it exists. React Three Fiber attributes are allowed in the scene file; unrelated unknown attributes remain errors. TypeScript also runs in strict mode. Bun is the package manager and runtime; project scripts explicitly run JavaScript CLIs with Bun.
+Biome replaces ESLint and Prettier. Every rule group, including nursery, is enabled at error severity; warnings fail CI too. Project, type-aware, React, test, and Tailwind domains are enabled; domains for unused frameworks are disabled to avoid conflicting rules. Any necessary framework-specific suppression must stay local and explain why it exists. React Three Fiber attributes are allowed in the scene file; unrelated unknown attributes remain errors. TypeScript also runs in strict mode. Bun is the package manager and runtime; project scripts explicitly run JavaScript CLIs with Bun.
 
 Dependencies are pinned to stable registry releases and resolved in `bun.lock`. Unused ESLint, Prettier, SWC, esbuild, and Vitest tooling has been removed. Tests use Bun's built-in runner. Tailwind 4 uses its Vite plugin. Colyseus uses the current `@colyseus/sdk` client and directly declares the schema, core, and transport packages shared by the apps.
 

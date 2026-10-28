@@ -5,7 +5,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "command": "bun build apps/server/src/main.ts --target=bun --outdir=dist/apps/server --external=@colyseus/* --external=colyseus",
+      "command": "bun build apps/server/src/main.ts --target=bun --outdir=dist/apps/server --external=@colyseus/*",
       "cache": true,
       "outputs": ["{workspaceRoot}/dist/apps/server"]
     },

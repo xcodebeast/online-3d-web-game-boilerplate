@@ -17,10 +17,21 @@ jobs:
       - uses: oven-sh/setup-bun@v2.2.0
         with:
           bun-version: 1.4.4
-      - run: bun install
-      - name: Export initial Bun lockfile
-        run: |
-          echo LOCKFILE_BEGIN
-          cat bun.lock
-          echo LOCKFILE_END
+      - run: bun install --frozen-lockfile
       - run: bun run check
+  containers:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: docker compose build
+      - run: docker compose up --detach
+      - name: Verify client and server containers
+        run: |
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://localhost:8080/ > /dev/null
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 --header 'Content-Type: application/json' --data '{}' http://localhost:3000/matchmake/joinOrCreate/game > /dev/null
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        run: docker compose down
