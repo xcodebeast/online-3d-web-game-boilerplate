@@ -54,7 +54,7 @@
   },
   "overrides": [
     {
-      "includes": ["apps/client/src/app/app.tsx"],
+      "includes": ["apps/client/src/scene/game-scene.tsx"],
       "linter": {
         "rules": {
           "suspicious": {
@@ -75,6 +75,14 @@
               }
             }
           }
+        }
+      }
+    },
+    {
+      "includes": ["e2e/**/*.ts", "playwright.config.ts"],
+      "linter": {
+        "domains": {
+          "playwright": "all"
         }
       }
     }

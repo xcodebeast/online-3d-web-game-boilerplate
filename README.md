@@ -25,6 +25,7 @@ Set `VITE_WS_SERVER_URL` in the client's environment to the browser-accessible W
 bun run check       # Biome, TypeScript, tests, and both production builds
 bun run lint:fix    # Apply safe Biome fixes
 bun run format     # Format supported files
+bun run test:browser # Production-browser regression tests (build first)
 ```
 
 Biome replaces ESLint and Prettier. Every rule group, including nursery, is enabled at error severity; warnings fail CI too. Project, type-aware, React, test, and Tailwind domains are enabled; domains for unused frameworks are disabled to avoid conflicting rules. Any necessary framework-specific suppression must stay local and explain why it exists. React Three Fiber attributes are allowed in the scene file; unrelated unknown attributes remain errors. TypeScript also runs in strict mode. Bun is the package manager and runtime; project scripts explicitly run JavaScript CLIs with Bun.
@@ -61,3 +62,17 @@ The URL is embedded at build time. The server container runs as the unprivileged
 ## Contributing
 
 Run `bun run check` before opening a pull request.
+
+## Client bundle
+
+The score controls and networking load first. The WebGL scene loads independently with a loading message and an error boundary, so a slow or failed scene download does not block scoring. The scene uses Fiber's `createRoot` API and typed `extend` registrations rather than registering the full Three.js namespace with `Canvas`. Keep new scene features inside that lazy boundary.
+
+Vite keeps Three.js core and renderer modules in separate cacheable chunks. Every client build enforces three limits: 140 KiB of initial gzip JavaScript (including static imports and preloaded dependencies), 375 KiB of total gzip JavaScript, and 450 KiB per minified JavaScript chunk. Changing chunk names or moving code between chunks cannot bypass the initial or total budgets.
+
+Browser tests run against production builds and cover scoring during a delayed scene download, 3D text interaction before and after resizing, and recovery from a failed scene chunk. To run them locally:
+
+```sh
+bun run build
+bun --bun playwright install chromium
+bun run test:browser
+```

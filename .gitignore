@@ -48,3 +48,6 @@ Thumbs.db
 .env.production
 .nx/workspace-data
 .nx/installation
+
+/test-results
+/playwright-report

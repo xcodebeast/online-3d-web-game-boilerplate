@@ -8,5 +8,25 @@ export default defineConfig({
   cacheDir: "../../node_modules/.vite/apps/client",
   server: { host: true, strictPort: true, port: 8080 },
   plugins: [react(), tailwindcss()],
-  build: { outDir: "../../dist/apps/client", emptyOutDir: true },
+  build: {
+    outDir: "../../dist/apps/client",
+    emptyOutDir: true,
+    manifest: true,
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: "three-core",
+              test: /node_modules\/three\/build\/three\.core\.js$/u,
+            },
+            {
+              name: "three-renderer",
+              test: /node_modules\/three\/build\/three\.module\.js$/u,
+            },
+          ],
+        },
+      },
+    },
+  },
 });
