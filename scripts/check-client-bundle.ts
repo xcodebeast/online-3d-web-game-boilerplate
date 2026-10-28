@@ -1,3 +1,5 @@
+// biome-ignore lint/correctness/noNodejsModules: This build CLI needs portable file-URL conversion; node:url is also built into Bun.
+import { fileURLToPath } from "node:url";
 import type { Manifest, ManifestChunk } from "vite";
 
 const outputDirectory = new URL("../dist/apps/client/", import.meta.url);
@@ -39,9 +41,10 @@ const manifest: Manifest = await Bun.file(
 ).json();
 const initialFiles = collectInitialFiles(manifest);
 const files = new Set(
-  Object.values(manifest)
-    .map((chunk) => chunk.file)
-    .filter((file) => file.endsWith(".js")),
+  new Bun.Glob("**/*.js").scanSync({
+    cwd: fileURLToPath(outputDirectory),
+    onlyFiles: true,
+  }),
 );
 let initialGzip = 0;
 let totalGzip = 0;
