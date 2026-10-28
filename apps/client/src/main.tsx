@@ -1,13 +1,15 @@
-import { StrictMode } from 'react';
-import { createRoot } from 'react-dom/client';
+// biome-ignore lint/correctness/noUnresolvedImports: React exports StrictMode through its conditional CommonJS entry point.
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { App } from "./app/app.tsx";
+import "./styles.css";
 
-import App from './app/app';
-
-const root = createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
+const root = document.querySelector("#root");
+if (!root) {
+  throw new Error("The root element is missing");
+}
+createRoot(root).render(
   <StrictMode>
     <App />
-  </StrictMode>
+  </StrictMode>,
 );

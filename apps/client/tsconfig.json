@@ -1,30 +1,7 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "jsx": "react-jsx",
-    "allowJs": false,
-    "esModuleInterop": false,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "types": ["vite/client"],
-    "baseUrl": ".",
-    "paths": {
-      "@common": ["../../libs/common/src/index.ts"],
-
-      "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"],
-      "@hooks/*": ["./src/hooks/*"],
-      "@pages/*": ["./src/pages/*"],
-      "@constants/*": ["./src/constants/*"],
-      "@stores/*": ["./src/stores/*"],
-      "@scenes/*": ["./src/scenes/*"],
-    }
-  },
-  "files": [],
-  "include": [],
-  "references": [
-    {
-      "path": "./tsconfig.app.json"
-    }
-  ],
-  "extends": "../../tsconfig.base.json"
+    "types": ["bun", "vite/client"]
+  }
 }

@@ -1,46 +1,22 @@
-version: "3.8"
-
-networks:
-  corp:
-    driver: bridge
-
 services:
   server:
-    container_name: server
     build:
-      context: ./
-      dockerfile: ./apps/server/Dockerfile
-      args:
-        NODE_ENV: "development"
-        BUILD_FLAG: ""
-    image: server:nx-dev
+      context: .
+      dockerfile: apps/server/Dockerfile
     ports:
-      - 3000:3000
+      - "3000:3000"
     environment:
-      NODE_ENV: "development"
+      NODE_ENV: production
       PORT: 3000
-    networks:
-      - corp
     restart: on-failure
-
   client:
     depends_on:
       - server
-    container_name: client
     build:
-      context: ./
-      cache_from:
-        - nginx:1.19.2
-      dockerfile: ./apps/client/Dockerfile
+      context: .
+      dockerfile: apps/client/Dockerfile
       args:
-        NODE_ENV: "development"
-        BUILD_FLAG: ""
-    image: client:nx-dev
+        VITE_WS_SERVER_URL: ${VITE_WS_SERVER_URL:-ws://localhost:3000}
     ports:
-      - 8080:80
-    environment:
-      NODE_ENV: "development"
-      PORT: 8080
-    networks:
-      - corp
+      - "8080:80"
     restart: on-failure

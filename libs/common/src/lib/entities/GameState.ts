@@ -1,31 +1,23 @@
 import { MapSchema, Schema, type } from "@colyseus/schema";
-import { Player } from "./Player";
-import { ClassProperties } from "../types";
+import { Player } from "./Player.ts";
 
-/** Game state properties type */
-export type GameStateProperties = ClassProperties<GameState>;
-
-/** Represents the game state in the server */
+/** Represents the authoritative game state sent to clients. */
 export class GameState extends Schema {
-    @type({ map: Player }) players = new MapSchema<Player>();
+  @type({ map: Player }) players: MapSchema<Player> = new MapSchema<Player>();
 
-    getPlayers() {
-        return Array.from(this.players.entries())
-    }
-
-    addPlayer(newPlayerId: Player['id']) {
-        this.players.set(newPlayerId, new Player(newPlayerId));
-    }
-
-    removePlayer(playerId: Player['id']) {
-        this.players.delete(playerId);
-    }
-
-    getPlayer(playerId: Player['id']) {
-        return this.players.get(playerId);
-    }
-
-    hasPlayer(playerId: Player['id']) {
-        return this.players.has(playerId);
-    }
+  getPlayers(): [string, Player][] {
+    return Array.from(this.players.entries());
+  }
+  addPlayer(playerId: string): void {
+    this.players.set(playerId, new Player(playerId));
+  }
+  removePlayer(playerId: string): void {
+    this.players.delete(playerId);
+  }
+  getPlayer(playerId: string): Player | undefined {
+    return this.players.get(playerId);
+  }
+  hasPlayer(playerId: string): boolean {
+    return this.players.has(playerId);
+  }
 }

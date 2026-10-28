@@ -46,3 +46,5 @@ Thumbs.db
 .env.development
 .env.test
 .env.production
+.nx/workspace-data
+.nx/installation

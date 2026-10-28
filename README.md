@@ -1,87 +1,63 @@
 # Online 3D Web Game Boilerplate
 
-# Setup
-You’ll need to install a few things before you have a working copy of the project.
+A React and Three.js client with a Colyseus multiplayer server, shared TypeScript schemas, and Zustand state. Nx coordinates the apps; Bun runs development, builds, tests, and the server.
 
-### Requirements:
+## Setup
 
-- node >= 18.1.2,
-- npm >= 10.5.2
+Install [Bun](https://bun.sh/) 1.4.4 or newer, then:
 
-### 1. Clone this repo:
+```sh
+git clone https://github.com/xcodebeast/online-3d-web-game-boilerplate.git
+cd online-3d-web-game-boilerplate
+bun install --frozen-lockfile
+cp apps/client/.env.example apps/client/.env
+cp apps/server/.env.example apps/server/.env
+bun run dev
+```
 
-Navigate into your workspace directory.
+Open [http://localhost:8080](http://localhost:8080). The server listens on port 3000. To run apps separately, use `bun run client:serve` and `bun run server:serve`.
 
-Run:
+Set `VITE_WS_SERVER_URL` in the client's environment to the browser-accessible WebSocket endpoint. Use `wss://` when serving the client over HTTPS. Set `PORT` in the server's environment to change its listening port.
 
-```git clone https://github.com/flobbun/online-web-game-boilerplate.git```
+## Checks
 
-### 2. Install dependencies:
+```sh
+bun run check       # Biome, TypeScript, tests, and both production builds
+bun run lint:fix    # Apply safe Biome fixes
+bun run format     # Format supported files
+```
 
-Navigate to the cloned repo’s directory.
+Biome replaces ESLint and Prettier. Every rule group, including nursery, is enabled at error severity; warnings fail CI too. Project, type-aware, React, test, and Tailwind domains are enabled; domains for unused frameworks are disabled to avoid conflicting rules. Any necessary framework-specific suppression must stay local and explain why it exists. React Three Fiber attributes are allowed in the scene file; unrelated unknown attributes remain errors. TypeScript also runs in strict mode. Bun is the package manager and runtime; project scripts explicitly run JavaScript CLIs with Bun.
 
-Run:
+Dependencies are pinned to stable registry releases and resolved in `bun.lock`. Unused ESLint, Prettier, SWC, esbuild, and Vitest tooling has been removed. Tests use Bun's built-in runner. Tailwind 4 uses its Vite plugin. Colyseus uses the current `@colyseus/sdk` client and directly declares the schema, core, and transport packages shared by the apps.
 
-```npm install```
+## Production
 
-### 3. Create a .env file:
+```sh
+bun run build
+bun run start
+```
 
-Both client and server folders have a `.env.example` with the necessary environment variables to work, you'll need to make a copy of them and rename it to `.env`.
+Build output goes into `dist/apps/client` and `dist/apps/server`. Serve the client as static files; `bun run start` launches the built server.
 
-Run the following commands in the root directory of the project:
+With Docker installed, build and launch both apps from source:
 
-```cp apps/client/.env.example apps/client/.env```
+```sh
+docker compose up --build
+```
 
-```cp apps/server/.env.example apps/server/.env```
+The client is available on port 8080 and the server on port 3000. For a remote deployment, set `VITE_WS_SERVER_URL` before building the client, for example:
 
-### 4. Run both, client and server:
+```sh
+VITE_WS_SERVER_URL=wss://game.example.com docker compose build client
+```
 
-```npm run dev```
+The URL is embedded at build time. The server container runs as the unprivileged `bun` user.
 
-or run them separately:
+## Shared code
 
-```npm run client```
-
-```npm run server```
-
-And that's it! You should see the client and server running in your terminal.
-
-Navigate to [http://localhost:4200](http://localhost:4200) to see your project in the browser.
-
-### Build for deployment:
-
-Run:
-
-```npm run build```
-
-This will create a `dist` folder in the root directory of the project with the client and server build files.
-
-### Run on a docker container:
-
-After building the project, you can run it on a docker.
-
-```docker-compose up```
-
-## What’s inside?
-
-Two apps, one for the client and one for the server.
-
-The client app is a simple react app that connects to the server via websockets.
-
-The server app is a simple node.js app that uses express.js.
-
-Both client and server use [colyseus](https://colyseus.io/) for the websocket communication and game state management.
-
-In the client app you can find a simple example of how to use the colyseus client to connect to the server and how to handle the game state.
-
-We use [zustand](https://zustand-demo.pmnd.rs/) for the client state management.
-
-The monorepo also has a small library to save types and entities, which can be shared between the client and the server.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+`libs/common/src` holds schemas and message constants. Import individual modules directly; explicit relative imports work consistently in Vite, Bun, TypeScript, and Biome.
 
 ## Contributing
 
-If you want to contribute to this project and make it better, your help is very welcome.
+Run `bun run check` before opening a pull request.

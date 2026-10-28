@@ -1,34 +1,37 @@
 name: CI
-
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-
 permissions:
-  actions: read
   contents: read
-
 jobs:
-  main:
+  check:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NX_DAEMON: "false"
+      NX_NO_CLOUD: "true"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7.0.1
+      - uses: oven-sh/setup-bun@v2.2.0
         with:
-          fetch-depth: 0
-
-      # Connect your workspace on nx.app and uncomment this to enable task distribution.
-      # The "--stop-agents-after" is optional, but allows idle agents to shut down once the "build" targets have been requested
-      # - run: npx nx-cloud start-ci-run --distribute-on="5 linux-medium-js" --stop-agents-after="build"
-
-      # Cache node_modules
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 20
-          cache: 'npm'
-      - run: npm ci
-      - uses: nrwl/nx-set-shas@v4
-
-      - run: npx nx-cloud record -- nx format:check
-      - run: npx nx affected -t lint test build
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun run check
+  containers:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: docker compose build
+      - run: docker compose up --detach
+      - name: Verify client and server containers
+        run: |
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 http://localhost:8080/ > /dev/null
+          curl --fail --silent --show-error --retry 15 --retry-connrefused --retry-delay 1 --header 'Content-Type: application/json' --data '{}' http://localhost:3000/matchmake/joinOrCreate/game > /dev/null
+      - if: failure()
+        run: docker compose logs
+      - if: always()
+        run: docker compose down
